@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'llama-server'
+    static_configs:
+      - targets: ['llama-server:8080']
+
+  - job_name: 'open-webui'
+    static_configs:
+      - targets: ['open-webui:8080']
+

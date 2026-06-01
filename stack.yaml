@@ -1,0 +1,73 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.6.0
+
+# NOTE: If you generated this yaml from an unprivileged and rootless podman container on an SELinux
+# enabled system, check the podman generate kube man page for steps to follow to ensure that your pod/container
+# has the right permissions to access the volumes added.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    bind-mount-options: /opt/models:Z
+  creationTimestamp: "2026-06-01T23:14:57Z"
+  labels:
+    app: llama-server-pod
+  name: llama-server-pod
+spec:
+  containers:
+  - args:
+    - -m
+    - /models/model.gguf
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8080"
+    image: ghcr.io/ggml-org/llama.cpp:server
+    name: llama-server
+    ports:
+    - containerPort: 8080
+      hostPort: 8080
+    volumeMounts:
+    - mountPath: /models
+      name: opt-models-host-0
+  - env:
+    - name: OPENAI_API_BASE_URL
+      value: http://llama-server:8080/v1
+    - name: OPENAI_API_KEY
+      value: sk-no-key-required
+    image: ghcr.io/open-webui/open-webui:main
+    name: open-webui
+    ports:
+    - containerPort: 8080
+      hostPort: 3000
+    securityContext: {}
+  - args:
+    - --config.file=/etc/prometheus/prometheus.yml
+    image: localhost/my-prometheus:latest
+    name: prometheus
+    ports:
+    - containerPort: 9090
+      hostPort: 9090
+    securityContext: {}
+    volumeMounts:
+    - mountPath: /prometheus
+      name: e3d96b15cbc6dfc62f3398b0ac5589f697293acb97cb266eb9c306a7c09f8993-pvc
+  - image: docker.io/grafana/grafana:latest
+    name: grafana
+    ports:
+    - containerPort: 3000
+      hostPort: 4000
+    securityContext:
+      runAsNonRoot: true
+  volumes:
+  - hostPath:
+      path: /opt/models
+      type: Directory
+    name: opt-models-host-0
+  - name: e3d96b15cbc6dfc62f3398b0ac5589f697293acb97cb266eb9c306a7c09f8993-pvc
+    persistentVolumeClaim:
+      claimName: e3d96b15cbc6dfc62f3398b0ac5589f697293acb97cb266eb9c306a7c09f8993
+
