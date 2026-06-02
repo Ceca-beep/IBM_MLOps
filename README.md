@@ -142,9 +142,12 @@ The entire deployment is automated via a Jenkins pipeline with the following sta
 | Verify containers | Confirms all containers are running correctly |
 
 To run the pipeline:
-1. Open Jenkins at `http://localhost:8081`
-2. Open the `AI-deploy` pipeline
-3. Click **Build Now**
+1.Start Jenkins if not already running:
+   sudo systemctl start jenkins
+   sudo systemctl status jenkins
+2. Open Jenkins at `http://localhost:8081`
+3. Open the `AI-deploy` pipeline
+4. Click **Build Now**
 
 ---
 
